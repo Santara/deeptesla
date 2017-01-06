@@ -32,7 +32,8 @@ def load_imgs():
 
     for p in purposes:
         for epoch_id in epochs[p]:
-            print 'processing and loading epoch {} into memory, current num of imgs is {}...'.format(epoch_id, len(imgs))
+            print 'processing and loading "{}" epoch {} into memory, current num of imgs is {}...'.format(
+                p, epoch_id, len(imgs[p]))
 
             vid_path = cm.jn(data_dir, 'epoch{:0>2}_front.mkv'.format(epoch_id))
             assert os.path.isfile(vid_path)
@@ -51,7 +52,7 @@ def load_imgs():
                     break
 
                 img = preprocess.preprocess(img)
-                imgs[purpose].append(img)
+                imgs[p].append(img)
 
             wheels[p].extend(yy)
             assert len(imgs[p]) == len(wheels[p])
