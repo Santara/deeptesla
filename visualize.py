@@ -66,15 +66,16 @@ def visualize(epoch_id, machine_steering, out_dir, perform_smoothing=False,
     steering_max = max(np.max(human_steering), np.max(machine_steering))
 
     assert os.path.isdir(epoch_dir)
-    vid_labels = 'dash, front'.split(', ')
-    vid_paths = [cm.jn(epoch_dir, 'epoch{:0>2}_{}.mkv'.format(epoch_id, x)) for x in vid_labels]
-    assert all([os.path.isfile(x) for x in vid_paths])
 
-    caps = [cv2.VideoCapture(x) for x in vid_paths]
-    n = len(caps)
-    imgs = [None for i in xrange(n)]
-    rets = [None for i in xrange(n)]
+    front_vid_path = cm.jn(epoch_dir, 'epoch{:0>2}_front.mkv'.format(epoch_id))
+    assert os.path.isfile(front_vid_path)
+    
+    dash_vid_path = cm.jn(epoch_dir, 'epoch{:0>2}_dash.mkv'.format(epoch_id))
+    dash_exists = os.path.isfile(front_vid_path)
 
+    front_cap = cv2.VideoCapture(front_vid_path)
+    dash_exists = cv2.VideoCapture(dash_vid_path) if dash_exists else None
+    
     assert os.path.isdir(out_dir)
     vid_size = cm.video_resolution_to_size('720p', width_first=True)
     out_path = cm.jn(out_dir, 'epoch{:0>2}_human_machine.mkv'.format(epoch_id))
@@ -85,16 +86,19 @@ def visualize(epoch_id, machine_steering, out_dir, perform_smoothing=False,
         if (f_cur != 0) and (f_cur % verbose_progress_step == 0):
             print 'completed {} of {} frames'.format(f_cur, len(machine_steering))
 
-        
         if (frame_count_limit is not None) and (f_cur >= frame_count_limit):
             break
             
-        for i in xrange(n):
-            rets[i], imgs[i] = caps[i].read()
-        assert all([rets[i] for i in xrange(n)])
+        fret, fimg = front_cap.read()
+        assert fret
+
+        if dash_exists:
+            dret, dimg = dash_cap.read()
+            assert dret
+        else:
+            dimg = fimg
+            dimg[:] = (0, 0, 0)
         
-        dimg = imgs[0]
-        rimg = imgs[1]
         ry0, rh = 80, 500
         dimg = dimg[100:, :930]
         dimg = cm.cv2_resize_by_height(dimg, h-rh)
