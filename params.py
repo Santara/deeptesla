@@ -18,7 +18,8 @@ out_dir = os.path.abspath('./output')
 shuffle_training = True
 
 assert os.path.isdir(data_dir)
-#assert os.path.isdir(out_dir)
+if not os.path.isdir(out_dir):
+    os.makedirs(out_dir)
 
 epochs = OrderedDict()
 # epochs['train'] = range(1, 11)
