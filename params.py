@@ -14,6 +14,7 @@ write_summary = True
 
 # change this to the directory that contains the source videos
 data_dir = os.path.abspath('./epochs')
+out_dir = os.path.abspath('./output')
 shuffle_training = True
 
 assert os.path.isdir(data_dir)
