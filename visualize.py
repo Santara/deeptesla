@@ -71,10 +71,10 @@ def visualize(epoch_id, machine_steering, out_dir, perform_smoothing=False,
     assert os.path.isfile(front_vid_path)
     
     dash_vid_path = cm.jn(epoch_dir, 'epoch{:0>2}_dash.mkv'.format(epoch_id))
-    dash_exists = os.path.isfile(front_vid_path)
+    dash_exists = os.path.isfile(dash_vid_path)
 
     front_cap = cv2.VideoCapture(front_vid_path)
-    dash_exists = cv2.VideoCapture(dash_vid_path) if dash_exists else None
+    dash_cap = cv2.VideoCapture(dash_vid_path) if dash_exists else None
     
     assert os.path.isdir(out_dir)
     vid_size = cm.video_resolution_to_size('720p', width_first=True)
@@ -89,8 +89,8 @@ def visualize(epoch_id, machine_steering, out_dir, perform_smoothing=False,
         if (frame_count_limit is not None) and (f_cur >= frame_count_limit):
             break
             
-        fret, fimg = front_cap.read()
-        assert fret
+        rret, rimg = front_cap.read()
+        assert rret
 
         if dash_exists:
             dret, dimg = dash_cap.read()
@@ -103,9 +103,8 @@ def visualize(epoch_id, machine_steering, out_dir, perform_smoothing=False,
         dimg = dimg[100:, :930]
         dimg = cm.cv2_resize_by_height(dimg, h-rh)
 
-        fimg = imgs[0]
+        fimg = rimg.copy()
         fimg[:] = (0, 0, 0)
-        fimg[:rh] = rimg[ry0:ry0+rh]
         fimg[:rh] = rimg[ry0:ry0+rh]
         dh, dw = dimg.shape[:2]
         fimg[rh:,:dw] = dimg[:]
