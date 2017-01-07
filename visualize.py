@@ -57,7 +57,7 @@ def visualize(epoch_id, machine_steering, out_dir, perform_smoothing=False,
     # for i in xrange(len(machine_steering)):
     #     delta += random.uniform(-1, 1)
     #     machine_steering[i] += delta
-
+    
     if perform_smoothing:
         machine_steering = list(cm.smooth(np.array(machine_steering)))
         #human_steering = list(cm.smooth(np.array(human_steering)))
@@ -96,7 +96,7 @@ def visualize(epoch_id, machine_steering, out_dir, perform_smoothing=False,
             dret, dimg = dash_cap.read()
             assert dret
         else:
-            dimg = fimg
+            dimg = rimg.copy()
             dimg[:] = (0, 0, 0)
         
         ry0, rh = 80, 500
@@ -208,8 +208,9 @@ def visualize(epoch_id, machine_steering, out_dir, perform_smoothing=False,
 
         vw.write(fimg)
 
-    for i in xrange(n):
-        caps[i].release()
+    front_cap.release()
+    if dash_exists:
+        dash_cap.release()
     vw.release()
 
     cm.mkv_to_mp4(out_path, remove_mkv=True)
